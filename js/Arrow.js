@@ -1,25 +1,25 @@
 class Arrow {
-    constructor(x, y, isItPartOfExplosion) {
-        this.pos = createVector(x, y);
-        this.partOfExplosion = isItPartOfExplosion;
-        this.lifeSpan = 255;
-        if (isItPartOfExplosion) {
-            this.vel = p5.Vector.random2D();
-            this.vel.mult(random(1, 2));
-        } else {
-            this.vel = createVector(0, random(-8, -14));
-        }
+    constructor(coords, player, floor) {
+        this.player = player;
+        this.floor = floor;
+        this.pos = createVector();
         this.acc = createVector();
+        this.vel = createVector();
+        this.mag = dist(coords[0].x, coords[0].y, coords[1].x, coords[1].y);
+        this.landed = false;
     }
 
     update() {
-        if (!this.partOfExplosion) {
-            this.vel.mult(1);
-            this.lifeSpan -= 4;
+        if (!this.landed) {
+            this.vel.add(this.acc);
+            this.pos.add(this.vel);
+            this.acc.mult(0);
         }
-        this.vel.add(this.acc);
-        this.pos.add(this.vel);
-        this.acc.mult(0);
+    }
+
+    shoot(f) {
+        f.mult(this.mag / 20);
+        this.applyForce(f);
     }
 
     applyForce(f) {
@@ -27,13 +27,17 @@ class Arrow {
     }
 
     show() {
-        if (!this.partOfExplosion) {
-            strokeWeight(2);
-            stroke(255, this.lifeSpan);
-        } else {
-            strokeWeight(4);
-            stroke(255);
+        push();
+        noStroke();
+        fill(200);
+        translate(this.player.pos.x, height - 200 - this.player.h / 2);
+        ellipse(this.pos.x, this.pos.y, 10);
+        pop();
+    }
+
+    edges() {
+        if (this.pos.y > 0 + this.player.h / 2) {
+            this.landed = true;
         }
-        point(this.pos.x, this.pos.y);
     }
 }

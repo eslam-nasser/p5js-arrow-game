@@ -1,6 +1,6 @@
 class Floor {
-    constructor(height) {
-        this.h = height;
+    constructor() {
+        this.h = 200;
     }
 
     show() {

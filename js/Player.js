@@ -1,21 +1,21 @@
 class Player {
-    constructor(x, w = 20, h = 40) {
+    constructor(x, y, w = 20, h = 40) {
         this.w = w;
         this.h = h;
-        this.location = createVector(x, 0);
+        this.pos = createVector(x, y);
     }
 
     show(floor) {
         push();
         fill(255);
         rectMode(CENTER);
-        rect(this.location.x, height - floor.h - this.h / 2, this.w, this.h);
+        rect(this.pos.x, this.pos.y, this.w, this.h);
         pop();
     }
 
     update() {
         // this.vel.add(this.acc);
-        // this.location.add(this.vel);
+        // this.pos.add(this.vel);
         // this.acc.set(0, 0);
     }
 
@@ -25,9 +25,9 @@ class Player {
 
     strictWalls() {
         // Floor
-        if (this.location.y >= height) {
+        if (this.pos.y >= height) {
             this.vel.y = 0;
-            this.location.y = height;
+            this.pos.y = height;
             this.allowToJumb = true;
         }
     }
