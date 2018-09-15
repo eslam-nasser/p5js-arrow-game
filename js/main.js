@@ -1,9 +1,9 @@
 let player_one, player_two;
 let floor;
-let arrows = [];
-let arrowDraggingCoords = [];
-let showArrowDragging = false;
-let arrowIsReleased = false;
+let balls = [];
+let ballDraggingCoords = [];
+let showBallDragging = false;
+let ballIsReleased = false;
 let playerOneTurn = true;
 let delta = 0;
 
@@ -13,28 +13,27 @@ function setup() {
     stroke(255);
     strokeWeight(4);
     floor = new Floor();
-    player_one = new Player(50, height - floor.h - 40 / 2);
-    player_two = new Player(width + 100, height - floor.h - 40 / 2);
+
+    let playersOffset = 100;
+    player_one = new Player(playersOffset, height - floor.h - 40 / 2);
+    player_two = new Player(width + playersOffset, height - floor.h - 40 / 2);
+
+    // frameRate(1);
 }
 
 function draw() {
     background(55);
 
-    let cameraPosition = {
-        x: playerOneTurn ? player_one.pos.x : player_one.pos.x,
-        y: playerOneTurn ? player_two.pos.y : player_two.pos.y
-    };
-    // console.log(cameraPosition);
-
-    // push();
-    // translate(cameraPosition.x, cameraPosition.y);
-    // translate(player_one.pos.x, player_one.pos.y);
-    // translate(delta, 0);
-    // fill(100);
-    // ellipse(-10, -10, 10);
-    // pop();
-
-    // delta -= 1;
+    translate(delta, 0);
+    if (!playerOneTurn) {
+        if (delta > -(width - 200)) {
+            delta -= 10;
+        }
+    } else {
+        if (delta < 0) {
+            delta += 10;
+        }
+    }
 
     // Floor
     floor.show();
@@ -47,61 +46,61 @@ function draw() {
     player_two.update();
     player_two.show(floor);
 
-    if (showArrowDragging && arrowDraggingCoords.length === 2) {
+    if (showBallDragging && ballDraggingCoords.length === 2) {
         stroke(255);
         strokeWeight(2);
         line(
-            arrowDraggingCoords[0].x,
-            arrowDraggingCoords[0].y,
-            arrowDraggingCoords[1].x,
-            arrowDraggingCoords[1].y
+            ballDraggingCoords[0].x - delta,
+            ballDraggingCoords[0].y,
+            ballDraggingCoords[1].x - delta,
+            ballDraggingCoords[1].y
         );
     }
 
-    if (arrowIsReleased) {
+    if (ballIsReleased) {
         let gravity = createVector(0, 0.2);
-        arrows.forEach(arrow => {
-            arrow.applyForce(gravity);
-            arrow.update();
-            arrow.edges();
-            arrow.show();
+        balls.forEach(ball => {
+            ball.applyForce(gravity);
+            ball.update();
+            ball.edges();
+            ball.show();
         });
     }
 }
 
-// Handle the arrow pull
+// Handle the ball pull
 function mousePressed() {
-    showArrowDragging = true;
-    arrowDraggingCoords[0] = {
+    showBallDragging = true;
+    ballDraggingCoords[0] = {
         x: mouseX,
         y: mouseY
     };
 }
 function mouseDragged() {
-    arrowDraggingCoords[1] = {
+    ballDraggingCoords[1] = {
         x: mouseX,
         y: mouseY
     };
 }
 function mouseReleased() {
-    let arrow = new Arrow(
-        arrowDraggingCoords,
+    let ball = new Ball(
+        ballDraggingCoords,
         playerOneTurn ? player_one : player_two,
         floor
     );
     playerOneTurn = !playerOneTurn;
     let angle = angleFromTwoPoints(
-        arrowDraggingCoords[0],
-        arrowDraggingCoords[1]
+        ballDraggingCoords[0],
+        ballDraggingCoords[1]
     );
     let vFromAngle = p5.Vector.fromAngle(angle);
-    arrow.shoot(vFromAngle);
-    arrows.push(arrow);
+    ball.shoot(vFromAngle);
+    balls.push(ball);
 
     // Reset
-    arrowIsReleased = true;
-    arrowDraggingCoords = [];
-    showArrowDragging = false;
+    ballIsReleased = true;
+    ballDraggingCoords = [];
+    showBallDragging = false;
 }
 
 function angleFromTwoPoints(p1, p2) {

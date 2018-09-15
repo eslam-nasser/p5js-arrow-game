@@ -6,6 +6,6 @@ class Floor {
     show() {
         fill(45);
         noStroke();
-        rect(0, height - this.h, width, height);
+        rect(0, height - this.h, width * 2, height);
     }
 }

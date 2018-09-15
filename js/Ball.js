@@ -1,4 +1,4 @@
-class Arrow {
+class Ball {
     constructor(coords, player, floor) {
         this.player = player;
         this.floor = floor;
@@ -19,6 +19,7 @@ class Arrow {
 
     shoot(f) {
         f.mult(this.mag / 20);
+        f.limit(12);
         this.applyForce(f);
     }
 
