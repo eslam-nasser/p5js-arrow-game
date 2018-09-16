@@ -18,7 +18,7 @@ function setup() {
     player_one = new Player(playersOffset, height - floor.h - 40 / 2);
     player_two = new Player(width + playersOffset, height - floor.h - 40 / 2);
 
-    // frameRate(1);
+    // frameRate(3);
 }
 
 function draw() {
@@ -39,12 +39,12 @@ function draw() {
     floor.show();
 
     // Player #1
-    player_one.update();
-    player_one.show(floor);
+    // player_one.update();
+    player_one.show();
 
     // Player #2
-    player_two.update();
-    player_two.show(floor);
+    // player_two.update();
+    player_two.show();
 
     if (showBallDragging && ballDraggingCoords.length === 2) {
         stroke(255);
@@ -59,12 +59,23 @@ function draw() {
 
     if (ballIsReleased) {
         let gravity = createVector(0, 0.2);
-        balls.forEach(ball => {
+        for (let i = balls.length - 1; i >= 0; i--) {
+            let ball = balls[i];
+
             ball.applyForce(gravity);
             ball.update();
-            ball.edges();
+            ball.edges(floor);
             ball.show();
-        });
+
+            if (ball.hits(playerOneTurn ? player_one : player_two)) {
+                ball.intersected = true;
+                ball.landed = true;
+            }
+        }
+    }
+    // Delete the oldest ball if there is too many balls
+    if (balls.length > 10) {
+        balls.splice(0, 1);
     }
 }
 

@@ -1,12 +1,15 @@
 class Ball {
     constructor(coords, player, floor) {
+        this.r = 10;
         this.player = player;
         this.floor = floor;
-        this.pos = createVector();
+        let playerPos = player.pos.copy();
+        this.pos = createVector(playerPos.x, playerPos.y);
         this.acc = createVector();
         this.vel = createVector();
         this.mag = dist(coords[0].x, coords[0].y, coords[1].x, coords[1].y);
         this.landed = false;
+        this.intersected = false;
     }
 
     update() {
@@ -23,21 +26,36 @@ class Ball {
         this.applyForce(f);
     }
 
+    hits(player) {
+        // console.log(player);
+
+        if (
+            // check x axis
+            this.pos.x > player.pos.x &&
+            this.pos.x < player.pos.x + player.w &&
+            // check y axis
+            this.pos.y > player.pos.y &&
+            this.pos.y < player.pos.y + player.h
+        ) {
+            return true;
+        }
+        return false;
+    }
+
     applyForce(f) {
         this.acc.add(f);
     }
 
     show() {
-        push();
         noStroke();
-        fill(200);
-        translate(this.player.pos.x, height - 200 - this.player.h / 2);
-        ellipse(this.pos.x, this.pos.y, 10);
-        pop();
+        fill(255);
+        if (this.landed && this.intersected) fill(255, 0, 0);
+        if (this.landed && !this.intersected) fill(255, 50);
+        ellipse(this.pos.x, this.pos.y, this.r);
     }
 
-    edges() {
-        if (this.pos.y > 0 + this.player.h / 2) {
+    edges(floor) {
+        if (this.pos.y > height - floor.h - this.r / 2) {
             this.landed = true;
         }
     }
