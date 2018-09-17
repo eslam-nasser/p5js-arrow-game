@@ -1,6 +1,6 @@
-class Ball {
+class Arrow {
     constructor(coords, player, floor) {
-        this.r = 10;
+        this.r = 5;
         this.player = player;
         this.floor = floor;
         let playerPos = player.pos.copy();
@@ -8,10 +8,14 @@ class Ball {
         this.acc = createVector();
         this.vel = createVector();
         this.mag =
-            dist(coords[0].x, coords[0].y, coords[1].x, coords[1].y) || 1;
+            coords.length === 2
+                ? dist(coords[0].x, coords[0].y, coords[1].x, coords[1].y)
+                : 1;
+
         this.landed = false;
         this.intersected = false;
         this.scrored = false;
+        this.angle = PI;
     }
 
     update() {
@@ -51,7 +55,23 @@ class Ball {
         fill(255);
         if (this.landed && this.intersected) fill(255, 0, 0);
         if (this.landed && !this.intersected) fill(255, 50);
-        ellipse(this.pos.x, this.pos.y, this.r);
+        push();
+        translate(this.pos.x, this.pos.y);
+        rotate(this.vel.heading());
+        rectMode(CENTER);
+        rect(0, 0, this.r * 4, this.r * 0.5);
+        // this tip
+        triangle(
+            (this.r * 2) / 2,
+            (-this.r * 2) / 2,
+
+            (this.r * 2) / 2,
+            (this.r * 2) / 2,
+
+            this.r * 2,
+            0
+        );
+        pop();
     }
 
     edges(floor) {

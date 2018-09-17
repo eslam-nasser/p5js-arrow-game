@@ -1,10 +1,10 @@
 let player_one, player_two, floor;
-let balls = [];
-let playerOneBalls = [];
-let playerTwoBalls = [];
-let ballDraggingCoords = [];
-let showBallDragging = false;
-let ballIsReleased = false;
+let arrows = [];
+let playerOneArrows = [];
+let playerTwoArrows = [];
+let arrowDraggingCoords = [];
+let showArrowDragging = false;
+let arrowIsReleased = false;
 let playerOneTurn = true;
 let delta = 0;
 
@@ -18,11 +18,6 @@ function setup() {
     let playersOffset = 100;
     player_one = new Player(playersOffset, height - floor.h - 40 / 2);
     player_two = new Player(width + playersOffset, height - floor.h - 40 / 2);
-
-    // playerOneBalls.txt = createP();
-    // playerTwoBalls.txt = createP();
-
-    // frameRate(3);
 }
 
 function draw() {
@@ -48,108 +43,108 @@ function draw() {
     // Player #2
     player_two.show();
 
-    if (showBallDragging && ballDraggingCoords.length === 2) {
+    if (showArrowDragging && arrowDraggingCoords.length === 2) {
         stroke(255);
         strokeWeight(1);
         line(
-            ballDraggingCoords[0].x - delta,
-            ballDraggingCoords[0].y,
-            ballDraggingCoords[1].x - delta,
-            ballDraggingCoords[1].y
+            arrowDraggingCoords[0].x - delta,
+            arrowDraggingCoords[0].y,
+            arrowDraggingCoords[1].x - delta,
+            arrowDraggingCoords[1].y
         );
     }
 
     let gravity = createVector(0, 0.2);
-    if (ballIsReleased) {
-        for (let i = balls.length - 1; i >= 0; i--) {
-            let ball = balls[i];
+    if (arrowIsReleased) {
+        for (let i = arrows.length - 1; i >= 0; i--) {
+            let arrow = arrows[i];
 
-            if (!ball.scrored) {
-                ball.applyForce(gravity);
-                ball.update();
-                ball.edges(floor);
-                ball.show();
+            if (!arrow.scrored) {
+                arrow.applyForce(gravity);
+                arrow.update();
+                arrow.edges(floor);
+                arrow.show();
             }
 
-            if (ball.hits(playerOneTurn ? player_one : player_two)) {
-                ball.intersected = true;
-                ball.landed = true;
-                if (!playerOneTurn && !ball.scrored) {
-                    playerOneBalls.push(copyInstance(ball));
-                } else if (playerOneTurn && !ball.scrored) {
-                    playerTwoBalls.push(copyInstance(ball));
+            if (arrow.hits(playerOneTurn ? player_one : player_two)) {
+                arrow.intersected = true;
+                arrow.landed = true;
+                if (!playerOneTurn && !arrow.scrored) {
+                    playerOneArrows.push(copyInstance(arrow));
+                } else if (playerOneTurn && !arrow.scrored) {
+                    playerTwoArrows.push(copyInstance(arrow));
                 }
-                ball.scrored = true;
+                arrow.scrored = true;
             }
         }
     }
-    // Delete the oldest ball if there is too many balls
-    if (balls.length > 10) {
-        balls.splice(0, 1);
+    // Delete the oldest arrow if there is too many arrows
+    if (arrows.length > 10) {
+        arrows.splice(0, 1);
     }
 
-    // Show the scored balls so that they don't disappear
-    playerOneBalls.forEach(ball => {
-        ball.applyForce(gravity);
-        ball.update();
-        ball.edges(floor);
-        ball.show();
+    // Show the scored arrows so that they don't disappear
+    playerOneArrows.forEach(arrow => {
+        arrow.applyForce(gravity);
+        arrow.update();
+        arrow.edges(floor);
+        arrow.show();
     });
-    playerTwoBalls.forEach(ball => {
-        ball.applyForce(gravity);
-        ball.update();
-        ball.edges(floor);
-        ball.show();
+    playerTwoArrows.forEach(arrow => {
+        arrow.applyForce(gravity);
+        arrow.update();
+        arrow.edges(floor);
+        arrow.show();
     });
 
     // Show score
     textSize(12);
     fill(255);
     text(
-        `Player one: ${playerOneBalls.length}`,
+        `Player one: ${playerOneArrows.length}`,
         player_one.pos.x,
         player_one.pos.y + player_one.h + 15
     );
     text(
-        `Player two: ${playerTwoBalls.length}`,
+        `Player two: ${playerTwoArrows.length}`,
         player_two.pos.x,
         player_two.pos.y + player_two.h + 15
     );
 }
 
-// Handle the ball pull
+// Handle the arrow pull
 function mousePressed() {
-    showBallDragging = true;
-    ballDraggingCoords[0] = {
+    showArrowDragging = true;
+    arrowDraggingCoords[0] = {
         x: mouseX,
         y: mouseY
     };
 }
 function mouseDragged() {
-    ballDraggingCoords[1] = {
+    arrowDraggingCoords[1] = {
         x: mouseX,
         y: mouseY
     };
 }
 function mouseReleased() {
-    let ball = new Ball(
-        ballDraggingCoords,
+    let arrow = new Arrow(
+        arrowDraggingCoords,
         playerOneTurn ? player_one : player_two,
         floor
     );
     playerOneTurn = !playerOneTurn;
     let angle = angleFromTwoPoints(
-        ballDraggingCoords[0],
-        ballDraggingCoords[1]
+        arrowDraggingCoords[0],
+        arrowDraggingCoords[1]
     );
     let vFromAngle = p5.Vector.fromAngle(angle);
-    ball.shoot(vFromAngle);
-    balls.push(ball);
+    arrow.shoot(vFromAngle);
+    arrows.push(arrow);
 
     // Reset
-    ballIsReleased = true;
-    ballDraggingCoords = [];
-    showBallDragging = false;
+    arrowIsReleased = true;
+    arrowDraggingCoords = [];
+    showArrowDragging = false;
 }
 
 function angleFromTwoPoints(p1, p2) {
