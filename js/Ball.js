@@ -7,9 +7,11 @@ class Ball {
         this.pos = createVector(playerPos.x, playerPos.y);
         this.acc = createVector();
         this.vel = createVector();
-        this.mag = dist(coords[0].x, coords[0].y, coords[1].x, coords[1].y);
+        this.mag =
+            dist(coords[0].x, coords[0].y, coords[1].x, coords[1].y) || 1;
         this.landed = false;
         this.intersected = false;
+        this.scrored = false;
     }
 
     update() {
@@ -27,8 +29,6 @@ class Ball {
     }
 
     hits(player) {
-        // console.log(player);
-
         if (
             // check x axis
             this.pos.x > player.pos.x &&
