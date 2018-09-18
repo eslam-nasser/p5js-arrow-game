@@ -3,6 +3,7 @@ class Floor {
         this.h = 200;
     }
 
+    // Render the floor
     show() {
         fill(45);
         noStroke();

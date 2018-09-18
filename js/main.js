@@ -10,9 +10,7 @@ let delta = 0;
 
 function setup() {
     createCanvas(411, 731);
-    angleMode(DEGREES);
     stroke(255);
-    strokeWeight(4);
     floor = new Floor();
 
     let playersOffset = 100;
@@ -23,7 +21,23 @@ function setup() {
 function draw() {
     background(55);
 
+    // Move the "Camera" by translating the whole scene
     translate(delta, 0);
+
+    // Show score
+    textSize(32);
+    textAlign(CENTER);
+    fill(255);
+    noStroke();
+    // Big numbers
+    text(`${playerOneArrows.length}`, 50 - delta, 50);
+    text(`${playerTwoArrows.length}`, width - 50 - delta, 50);
+    // Players names
+    textSize(13);
+    text(`Player #1`, 50 - delta, 75);
+    text(`Player #2`, width - 50 - delta, 75);
+
+    // Increasing delta
     if (!playerOneTurn) {
         if (delta > -(width - 200)) {
             delta -= 10;
@@ -43,9 +57,9 @@ function draw() {
     // Player #2
     player_two.show();
 
+    // If the user is dragging the mouse we need to draw the line that represent the arrow's angle and magnitude
     if (showArrowDragging && arrowDraggingCoords.length === 2) {
         stroke(255);
-        strokeWeight(1);
         line(
             arrowDraggingCoords[0].x - delta,
             arrowDraggingCoords[0].y,
@@ -54,27 +68,34 @@ function draw() {
         );
     }
 
+    // Create gravity force
     let gravity = createVector(0, 0.2);
     if (arrowIsReleased) {
         for (let i = arrows.length - 1; i >= 0; i--) {
             let arrow = arrows[i];
 
-            if (!arrow.scrored) {
+            if (!arrow.scored) {
                 arrow.applyForce(gravity);
                 arrow.update();
                 arrow.edges(floor);
                 arrow.show();
             }
 
+            // If an arrow hits the opposite side
             if (arrow.hits(playerOneTurn ? player_one : player_two)) {
-                arrow.intersected = true;
-                arrow.landed = true;
-                if (!playerOneTurn && !arrow.scrored) {
+                arrow.intersected = true; // check this arrow as intersected so we can change its color
+                arrow.landed = true; // check this arrow as landed so it can stop moving
+
+                // If we didn't check this arrow as scored and its player two turn
+                if (!playerOneTurn && !arrow.scored) {
                     playerOneArrows.push(copyInstance(arrow));
-                } else if (playerOneTurn && !arrow.scrored) {
+                }
+                // If we didn't check this arrow as scored and its player one turn
+                if (playerOneTurn && !arrow.scored) {
                     playerTwoArrows.push(copyInstance(arrow));
                 }
-                arrow.scrored = true;
+                // check this arrow as scored so we don't count it multiple times
+                arrow.scored = true;
             }
         }
     }
@@ -96,20 +117,6 @@ function draw() {
         arrow.edges(floor);
         arrow.show();
     });
-
-    // Show score
-    textSize(12);
-    fill(255);
-    text(
-        `Player one: ${playerOneArrows.length}`,
-        player_one.pos.x,
-        player_one.pos.y + player_one.h + 15
-    );
-    text(
-        `Player two: ${playerTwoArrows.length}`,
-        player_two.pos.x,
-        player_two.pos.y + player_two.h + 15
-    );
 }
 
 // Handle the arrow pull
@@ -127,21 +134,27 @@ function mouseDragged() {
     };
 }
 function mouseReleased() {
+    // After the user drag and release we will create a new arrow with the dragging details
     let arrow = new Arrow(
         arrowDraggingCoords,
         playerOneTurn ? player_one : player_two,
         floor
     );
+    // Pass the turn the other player
     playerOneTurn = !playerOneTurn;
+    // We get the angle of the user's dragging coords
     let angle =
         arrowDraggingCoords.length === 2
             ? angleFromTwoPoints(arrowDraggingCoords[0], arrowDraggingCoords[1])
             : 0;
+    // Create a Vector from this angle, this vector represent the arrow's force
     let vFromAngle = p5.Vector.fromAngle(angle);
+    // Apply this force to the arrow
     arrow.shoot(vFromAngle);
+    // Add this arrow to the rest of the old arrows
     arrows.push(arrow);
 
-    // Reset
+    // Reset the dragging values
     arrowIsReleased = true;
     arrowDraggingCoords = [];
     showArrowDragging = false;
