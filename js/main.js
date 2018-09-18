@@ -133,10 +133,10 @@ function mouseReleased() {
         floor
     );
     playerOneTurn = !playerOneTurn;
-    let angle = angleFromTwoPoints(
-        arrowDraggingCoords[0],
-        arrowDraggingCoords[1]
-    );
+    let angle =
+        arrowDraggingCoords.length === 2
+            ? angleFromTwoPoints(arrowDraggingCoords[0], arrowDraggingCoords[1])
+            : 0;
     let vFromAngle = p5.Vector.fromAngle(angle);
     arrow.shoot(vFromAngle);
     arrows.push(arrow);
